@@ -69,26 +69,29 @@ public class GenericsAssignmentRevised<T extends Runnable> {
 
     public void stop(boolean wait) throws InterruptedException {
         //writeLock
-        if(wait){
-            readWriteLock.writeLock().lock();
-            waitUntilDone();
-            this.stop = true;
-            readWriteLock.writeLock().unlock();
-        }
+            if(wait){
+                readWriteLock.writeLock().lock();
+                waitUntilDone();
+                this.stop = true;
+                readWriteLock.writeLock().unlock();
+            }
     }
 
     public void stopNow(boolean drain) throws InterruptedException {
         //use interrupt() to stop the thread
         //drain = empties the priorityQueue
-
+        consumerThread.interrupt();
+        if(drain){
+            drain();
+        }
     }
 
 
     public void waitUntilDone() throws InterruptedException {
-        if(consumerThread.isAlive())
-            consumerThread.join();
+        if(consumerThread.isAlive()){
+                consumerThread.join();
+        }
             //lock
-
     }
 
 }
