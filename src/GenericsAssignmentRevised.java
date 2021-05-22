@@ -69,6 +69,12 @@ public class GenericsAssignmentRevised<T extends Runnable> {
 
     public void stop(boolean wait) throws InterruptedException {
         //writeLock
+        if(wait){
+            readWriteLock.writeLock().lock();
+            waitUntilDone();
+            this.stop = true;
+            readWriteLock.writeLock().unlock();
+        }
     }
 
     public void stopNow(boolean drain) throws InterruptedException {
