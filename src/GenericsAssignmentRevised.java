@@ -79,6 +79,9 @@ public class GenericsAssignmentRevised<T extends Runnable> {
 
 
     public void waitUntilDone() throws InterruptedException {
+        if(consumerThread.isAlive())
+            consumerThread.join();
+            //lock
 
     }
 
