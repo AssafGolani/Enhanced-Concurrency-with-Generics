@@ -1,13 +1,23 @@
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Function;
 
+/**
+ * Submit either Callable or Runnable but the blockingQueue maintains only Runnable
+ * @param <T>
+ */
 
 public class GenericsAssignmentRevised<T extends Runnable> {
     protected boolean stop = false;
     protected boolean stopNow = false;
-    protected final BlockingQueue<T> taskQueue;
+    protected final BlockingQueue<T> taskQueue; // Blocking Queue type of Runnable
     protected final Thread consumerThread;
+    protected final List<Runnable> runnableList = new ArrayList<Runnable>();
+
 
     private final ReentrantReadWriteLock readWriteLock=new ReentrantReadWriteLock();
 
@@ -43,7 +53,6 @@ public class GenericsAssignmentRevised<T extends Runnable> {
     }
 
     public void submitTask(final Runnable runnable) throws InterruptedException{
-
     }
 
     public<V> Future<V> submitTask(final Callable<V> callable) throws InterruptedException {
@@ -52,16 +61,19 @@ public class GenericsAssignmentRevised<T extends Runnable> {
 
 
     public List<Runnable> drain(){
-        return null;
+        this.taskQueue.drainTo(runnableList);
+        return runnableList;
     }
 
     private volatile boolean alreadyStop =false;
 
     public void stop(boolean wait) throws InterruptedException {
-
+        //writeLock
     }
 
     public void stopNow(boolean drain) throws InterruptedException {
+        //use interrupt() to stop the thread
+        //drain = empties the priorityQueue
 
     }
 

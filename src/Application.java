@@ -17,7 +17,7 @@ public class Application {
 
         service.submitTask(() -> System.out.println("a runnable"));
 
-        service.submitTask(new Runnable() {
+        service.submitTask(new Runnable()  {
             @Override
             public void run() {
                 System.out.println("Fun");

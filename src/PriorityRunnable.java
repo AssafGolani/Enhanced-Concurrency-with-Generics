@@ -1,16 +1,12 @@
 import org.w3c.dom.html.HTMLImageElement;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
- * A type that represtents a task to be run in a separate thread, according to a priority parameter.
+ * A type that represents a task to be run in a separate thread, according to a priority parameter.
  */
 
 public class PriorityRunnable implements Runnable, Comparable<PriorityRunnable>{
-
     /*
     Strategy Pattern:
     1. implement an interface
@@ -18,7 +14,6 @@ public class PriorityRunnable implements Runnable, Comparable<PriorityRunnable>{
     3. in the constructor/setter method get a variable of the same type that we implement
     4. Dependency injection - in the method override, invoke the data member
      */
-
     private  Runnable innerRunnable;
     private  int priority;
     private static final int DEFAULT_PRIORITY = 5;
