@@ -53,6 +53,10 @@ public class GenericsAssignmentRevised<T extends Runnable> {
     }
 
     public void submitTask(final Runnable runnable) throws InterruptedException{
+        if(runnable==null) return;
+        readWriteLock.writeLock().lock();
+        taskQueue.offer((T) new PriorityRunnable(runnable));
+        readWriteLock.writeLock().unlock();
     }
 
     public<V> Future<V> submitTask(final Callable<V> callable) throws InterruptedException {
