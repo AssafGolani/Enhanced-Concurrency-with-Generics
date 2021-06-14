@@ -60,7 +60,16 @@ public class GenericsAssignmentRevised<T extends Runnable> {
     }
 
     public<V> Future<V> submitTask(final Callable<V> callable) throws InterruptedException {
-        return null;
+        if (callable == null) throw new NullPointerException();
+        readWriteLock.writeLock().lock();
+        /**
+         * Priority Task implements the interface RunnableFuture (which is Runnable)
+         * It can get either Runnable or Callable but return a FutureTask
+         * This is how we can run (or transform) a Callable task as a Runnable task and overcome our challenge.
+         */
+        RunnableFuture<T> fCallable = new PriorityTask(callable,1); // fCallable = futureCallable
+        readWriteLock.writeLock().unlock();
+        return (Future<V>) fCallable; // we return fCallable as Future by using casting.
     }
 
 
