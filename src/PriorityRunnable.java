@@ -39,7 +39,7 @@ public class PriorityRunnable implements Runnable, Comparable<PriorityRunnable>{
         }
     }
 
-    public static void main(String[] args) {
+/*    public static void main(String[] args) {
         ThreadPoolExecutor threadPoolExecutor =  new ThreadPoolExecutor(2,5,10, TimeUnit.SECONDS, new PriorityBlockingQueue<>());
 
         PriorityRunnable pr1 = new PriorityRunnable(()-> System.out.println(Runtime.getRuntime().totalMemory()));
@@ -54,12 +54,11 @@ public class PriorityRunnable implements Runnable, Comparable<PriorityRunnable>{
             }
         };
         PriorityRunnable pr3 = new PriorityRunnable(innerRunnable,3);
-        System.out.println(pr1.compareTo(pr2));
 
         threadPoolExecutor.execute(pr1);
         threadPoolExecutor.execute(pr2);
         threadPoolExecutor.execute(pr3);
 
 
-    }
+    }*/
 }
