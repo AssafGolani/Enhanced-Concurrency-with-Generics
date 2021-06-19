@@ -1,7 +1,4 @@
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.*;
 
 public class Application {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
@@ -26,7 +23,7 @@ public class Application {
 
         Callable<String> stringCallable= () -> {
             try {
-                Thread.sleep(5000); // wait until interrupt
+                Thread.sleep(5000);// wait until interrupt
             } catch (InterruptedException e) {
                 System.out.println("interrupted");
             }
@@ -36,6 +33,7 @@ public class Application {
         Future<String> anotherFutureString = service.submitTask(stringCallable);
 
         System.out.println(futureString.get());
+
         System.out.println(anotherFutureString.get());
 
         service.stop(false);

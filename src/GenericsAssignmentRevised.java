@@ -53,21 +53,22 @@ public class GenericsAssignmentRevised<T extends Runnable> {
     }
 
     public void submitTask(final Runnable runnable) throws InterruptedException{
-        if(runnable==null) return;
+        if(runnable==null) throw new InterruptedException();
         readWriteLock.writeLock().lock();
-        taskQueue.offer((T) new PriorityRunnable(runnable));
+        taskQueue.offer((T) new PriorityRunnable(runnable)); // adding the runnable task to the BlockingQueue
         readWriteLock.writeLock().unlock();
     }
 
     public<V> Future<V> submitTask(final Callable<V> callable) throws InterruptedException {
-        if (callable == null) throw new NullPointerException();
+        if (callable == null) throw new InterruptedException();
         readWriteLock.writeLock().lock();
         /**
          * Priority Task implements the interface RunnableFuture (which is Runnable)
          * It can get either Runnable or Callable but return a FutureTask
          * This is how we can run (or transform) a Callable task as a Runnable task and overcome our challenge.
          */
-        RunnableFuture<T> fCallable = new PriorityTask(callable,1); // fCallable = futureCallable
+        RunnableFuture<T> fCallable = new PriorityTask(callable,1); // fCallable => futureCallable
+        taskQueue.offer((T)new PriorityRunnable(fCallable));// adding the task to the BlockingQueue
         readWriteLock.writeLock().unlock();
         return (Future<V>) fCallable; // we return fCallable as Future by using casting.
     }
@@ -83,11 +84,12 @@ public class GenericsAssignmentRevised<T extends Runnable> {
     public void stop(boolean wait) throws InterruptedException {
         //writeLock
             if(wait){
-                readWriteLock.writeLock().lock();
                 waitUntilDone();
-                this.stop = true;
-                readWriteLock.writeLock().unlock();
             }
+        readWriteLock.writeLock().lock();
+        this.stop = true;
+        alreadyStop = true;
+        readWriteLock.writeLock().unlock();
     }
 
     public void stopNow(boolean drain) throws InterruptedException {
@@ -98,7 +100,6 @@ public class GenericsAssignmentRevised<T extends Runnable> {
             drain();
         }
     }
-
 
     public void waitUntilDone() throws InterruptedException {
         if(consumerThread.isAlive()){
