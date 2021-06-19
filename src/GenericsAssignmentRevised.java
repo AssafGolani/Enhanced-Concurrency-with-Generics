@@ -53,14 +53,14 @@ public class GenericsAssignmentRevised<T extends Runnable> {
     }
 
     public void submitTask(final Runnable runnable) throws InterruptedException{
-        if(runnable==null) throw new InterruptedException();
+        if(runnable==null) throw new NullPointerException();
         readWriteLock.writeLock().lock();
         taskQueue.offer((T) new PriorityRunnable(runnable)); // adding the runnable task to the BlockingQueue
         readWriteLock.writeLock().unlock();
     }
 
     public<V> Future<V> submitTask(final Callable<V> callable) throws InterruptedException {
-        if (callable == null) throw new InterruptedException();
+        if (callable == null) throw new NullPointerException();
         readWriteLock.writeLock().lock();
         /**
          * Priority Task implements the interface RunnableFuture (which is Runnable)
@@ -82,10 +82,9 @@ public class GenericsAssignmentRevised<T extends Runnable> {
     private volatile boolean alreadyStop =false;
 
     public void stop(boolean wait) throws InterruptedException {
-        //writeLock
-            if(wait){
-                waitUntilDone();
-            }
+        if(wait)
+            waitUntilDone();
+        consumerThread.interrupt();
         readWriteLock.writeLock().lock();
         this.stop = true;
         alreadyStop = true;
@@ -105,7 +104,6 @@ public class GenericsAssignmentRevised<T extends Runnable> {
         if(consumerThread.isAlive()){
                 consumerThread.join();
         }
-            //lock
     }
 
 }
