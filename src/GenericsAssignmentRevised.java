@@ -54,28 +54,33 @@ public class GenericsAssignmentRevised<T extends Runnable> {
 
     public void submitTask(final Runnable runnable) throws InterruptedException{
         if(runnable==null) throw new NullPointerException();
-        readWriteLock.writeLock().lock();
-        taskQueue.offer((T) new PriorityRunnable(runnable)); // adding the runnable task to the BlockingQueue
-        readWriteLock.writeLock().unlock();
-    }
+        if(!stop){
+            readWriteLock.writeLock().lock();
+            taskQueue.offer((T) new PriorityRunnable(runnable)); // adding the runnable task to the BlockingQueue
+            readWriteLock.writeLock().unlock();
+        }
 
+    }
+    /**
+     * Priority Task implements the interface RunnableFuture (which is Runnable)
+     * It can get either Runnable or Callable but return a FutureTask
+     * This is how we can run (or transform) a Callable task as a Runnable task and overcome our challenge.
+     */
     public<V> Future<V> submitTask(final Callable<V> callable) throws InterruptedException {
         if (callable == null) throw new NullPointerException();
-        readWriteLock.writeLock().lock();
-        /**
-         * Priority Task implements the interface RunnableFuture (which is Runnable)
-         * It can get either Runnable or Callable but return a FutureTask
-         * This is how we can run (or transform) a Callable task as a Runnable task and overcome our challenge.
-         */
         RunnableFuture<T> fCallable = new PriorityTask(callable,1); // fCallable => futureCallable
+        if(!stop){
+        readWriteLock.writeLock().lock();
         taskQueue.offer((T)new PriorityRunnable(fCallable));// adding the task to the BlockingQueue
         readWriteLock.writeLock().unlock();
+        }
         return (Future<V>) fCallable; // we return fCallable as Future by using casting.
     }
 
-
     public List<Runnable> drain(){
-        this.taskQueue.drainTo(runnableList);
+        readWriteLock.writeLock().lock();
+        this.taskQueue.drainTo(runnableList); //drains the tasks to the array list
+        readWriteLock.writeLock().unlock();
         return runnableList;
     }
 
@@ -83,26 +88,32 @@ public class GenericsAssignmentRevised<T extends Runnable> {
 
     public void stop(boolean wait) throws InterruptedException {
         if(wait)
-            waitUntilDone();
-        consumerThread.interrupt();
+            waitUntilDone();// we wait until the thread has died
+        consumerThread.interrupt(); // we interrupt the thread
         readWriteLock.writeLock().lock();
         this.stop = true;
-        alreadyStop = true;
         readWriteLock.writeLock().unlock();
     }
 
     public void stopNow(boolean drain) throws InterruptedException {
         //use interrupt() to stop the thread
         //drain = empties the priorityQueue
-        consumerThread.interrupt();
+        if(stop){
+            alreadyStop = true; // if we have already stopped, we change alreadyStop to true
+            }
+        readWriteLock.writeLock().lock();
+        consumerThread.interrupt(); // we interrupt the thread
         if(drain){
-            drain();
+            drain(); //calls the drain method
         }
+        readWriteLock.writeLock().unlock();
     }
 
     public void waitUntilDone() throws InterruptedException {
-        if(consumerThread.isAlive()){
-                consumerThread.join();
+        if(consumerThread.isAlive()){ //check if the thread is alive
+            readWriteLock.writeLock().lock();
+            consumerThread.join(); // wait for the thread to die
+            readWriteLock.writeLock().unlock();
         }
     }
 
